@@ -5,7 +5,7 @@ from .models import File, FileGroup
 class FileGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileGroup
-        fields = ['id', 'name']
+        fields = ['name']
 
 
 class FileSerializer(serializers.ModelSerializer):
