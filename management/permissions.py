@@ -1,8 +1,18 @@
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions
 
 
-class IsOwnerOrReadOnly(BasePermission):
+class IsOwnerOrSharedWith(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+        # Check if the user is the owner of the file
+        if request.user == obj.owner:
             return True
-        return obj.owner == request.user
+
+        # Check if the user is in the shared_with field
+        if request.user in obj.shared_with.all():
+            # Disallow editing for shared users
+            if view.action in ['update', 'partial_update']:
+                return False
+            return True
+
+        # Default deny permission
+        return False
