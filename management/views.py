@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import File, FileGroup
 from .serializers import FileSerializer, FileGroupSerializer
+from .permissions import IsOwnerOrSharedWith
 
 
 class FileGroupViewSet(viewsets.ViewSet):
@@ -33,17 +34,18 @@ class FileGroupViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
-        operation_description='Retrieve a file group',
-        operation_summary='Get a file group',
+        operation_description='List files belonging to group',
+        operation_summary='Get files belonging to group',
         responses={200: FileGroupSerializer,
                    404: 'FileGroup not Found'
                    }
     )
-    def retrieve(self, request, pk):
+    def list_group_files(self, request, pk):
         group = FileGroup.objects.filter(pk=pk, owner=request.user)
         if not group.exists():
             return Response(data={'error': 'FileGroup not found'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = FileGroupSerializer(group.first())
+        files = File.objects.filter(owner=request.user, group_id=pk)
+        serializer = FileSerializer(files, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -79,7 +81,7 @@ class FileGroupViewSet(viewsets.ViewSet):
 
 
 class FileViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrSharedWith]
 
     @swagger_auto_schema(
         operation_description='List all files',
@@ -90,6 +92,16 @@ class FileViewSet(viewsets.ViewSet):
     def list_files(self, request):
         files = File.objects.filter(owner=request.user)
         serializer = FileSerializer(files, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_description='List files shared with the authenticated user',
+        operation_summary='Get shared files',
+        responses={200: FileSerializer(many=True)}
+    )
+    def list_shared_with_me(self, request):
+        shared_files = File.objects.filter(shared_with=request.user)
+        serializer = FileSerializer(shared_files, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -116,9 +128,10 @@ class FileViewSet(viewsets.ViewSet):
                    }
     )
     def retrieve_file(self, request, pk):
-        file = File.objects.filter(pk=pk, owner=request.user)
+        file = File.objects.filter(pk=pk)
         if not file.exists():
             return Response(data={'error': 'File not found'}, status=status.HTTP_404_NOT_FOUND)
+        self.check_object_permissions(request, file)
         serializer = FileSerializer(file.first())
         return Response(serializer.data, status=status.HTTP_200_OK)
 
