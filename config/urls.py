@@ -29,8 +29,6 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/auth/', include('authentication.urls')),
-    path('api/v1/token/', TokenObtainPairView.as_view()),
-    path('api/v1/token/refresh/', TokenRefreshView.as_view()),
     path('api/v1/management/', include('management.urls')),
     re_path(r'static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
     re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
