@@ -10,7 +10,7 @@ class IsOwnerOrSharedWith(permissions.BasePermission):
         # Check if the user is in the shared_with field
         if request.user in obj.shared_with.all():
             # Disallow editing for shared users
-            if view.action in ['update', 'partial_update']:
+            if view.action in ['PUT', 'PATCH']:
                 return False
             return True
 
