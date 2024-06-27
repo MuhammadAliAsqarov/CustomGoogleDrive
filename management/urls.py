@@ -6,7 +6,7 @@ file_group_list = FileGroupViewSet.as_view({
     'post': 'create'
 })
 file_group_detail = FileGroupViewSet.as_view({
-    'get': 'retrieve',
+    'get': 'list_group_files',
     'put': 'update',
     'delete': 'delete'
 })
@@ -26,4 +26,5 @@ urlpatterns = [
     path('file-groups/<int:pk>/', file_group_detail, name='file-group-detail'),
     path('files/', file_list, name='file-list'),
     path('files/<int:pk>/', file_detail, name='file-detail'),
+    path('files/shared/', FileViewSet.as_view({'get': 'list_shared_with_me'}), name='file-detail'),
 ]
