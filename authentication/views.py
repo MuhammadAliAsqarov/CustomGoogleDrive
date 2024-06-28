@@ -28,7 +28,9 @@ class AuthViewSet(viewsets.ViewSet):
     def register(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            user.password = make_password(user.password)
+            user.save()
             return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -46,6 +48,8 @@ class AuthViewSet(viewsets.ViewSet):
     def login(self, request):
         data = request.data
         user = User.objects.filter(username=data['username']).first()
+        if not user:
+            return Response({'error': 'User not found', 'ok': False}, status=status.HTTP_400_BAD_REQUEST)
         if check_password(data['password'], user.password):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
