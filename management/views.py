@@ -5,13 +5,13 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import File, FileGroup
 from .serializers import FileSerializer, FileGroupSerializer
-from .permissions import IsOwnerOrSharedWith
+from .permissions import IsOwnerOrSharedWith,IsOwner
 
 User = get_user_model()
 
 
 class FileGroupViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsOwner]
 
     @swagger_auto_schema(
         operation_description='List all file groups',
