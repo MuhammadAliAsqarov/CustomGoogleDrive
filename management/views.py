@@ -82,7 +82,6 @@ class FileGroupViewSet(viewsets.ViewSet):
 
 class FileViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrSharedWith]
-
     @swagger_auto_schema(
         operation_description='List all files',
         operation_summary='Get files',
