@@ -2,6 +2,19 @@ from rest_framework import permissions
 from django.db.models import QuerySet
 
 
+class IsOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # If obj is a queryset, get the first instance
+        if isinstance(obj, QuerySet):
+            obj = obj.first()
+
+        # Check if the user is the owner of the file
+        if request.user == obj.owner:
+            return True
+        # Default deny permission
+        return False
+
+
 class IsOwnerOrSharedWith(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         # If obj is a queryset, get the first instance
