@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -5,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import File, FileGroup
 from .serializers import FileSerializer, FileGroupSerializer
 from .permissions import IsOwnerOrSharedWith
+
+User = get_user_model()
 
 
 class FileGroupViewSet(viewsets.ViewSet):
@@ -82,6 +85,7 @@ class FileGroupViewSet(viewsets.ViewSet):
 
 class FileViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrSharedWith]
+
     @swagger_auto_schema(
         operation_description='List all files',
         operation_summary='Get files',
@@ -166,3 +170,27 @@ class FileViewSet(viewsets.ViewSet):
             return Response(data={'error': 'File not found'}, status=status.HTTP_404_NOT_FOUND)
         file.first().delete()
         return Response(data={'message': 'File deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        operation_description='Grant permission to another user',
+        operation_summary='Grant permission',
+        responses={
+            200: 'Permission granted successfully',
+            400: 'Bad Request'
+        }
+    )
+    def grant_permission(self, request, pk, user_id):
+        file_instance = File.objects.filter(pk=pk, owner=request.user).first()
+        if not file_instance:
+            return Response(data={'error': 'File not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if user_id == request.user.id:
+            return Response({'error': 'Cannot grant permission to yourself'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(pk=user_id).first()
+        if not user:
+            return Response(data={'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        file_instance.shared_with.add(user)
+        file_instance.save()
+
+        return Response({'message': f'Permission granted to {user.username}'}, status=status.HTTP_200_OK)
