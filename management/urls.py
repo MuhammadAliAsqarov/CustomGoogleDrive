@@ -27,4 +27,6 @@ urlpatterns = [
     path('files/', file_list, name='file-list'),
     path('files/<int:pk>/', file_detail, name='file-detail'),
     path('files/shared/', FileViewSet.as_view({'get': 'list_shared_with_me'}), name='file-detail'),
+    path('files/<int:pk>/grant_permission/users/<int:user_id>/', FileViewSet.as_view({'patch': 'grant_permission'}),
+         name='file-grant-permission'),
 ]
