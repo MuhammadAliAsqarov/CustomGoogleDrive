@@ -15,4 +15,3 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         validated_data['password'] = make_password(validated_data['password'])
         user = User.objects.create(**validated_data)
         return user
-kwargs = {'password': {'write_only': True}}

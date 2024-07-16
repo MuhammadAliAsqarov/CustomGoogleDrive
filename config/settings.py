@@ -1,4 +1,3 @@
-
 from datetime import timedelta
 from pathlib import Path
 
@@ -29,11 +28,13 @@ INSTALLED_APPS = [
     # system packages
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
 
     # local apps
     'authentication',
     'management',
+
 ]
 
 MIDDLEWARE = [
@@ -126,7 +127,9 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'authentication.User'
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=30)
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
 }
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {

@@ -4,5 +4,5 @@ from .views import UserViewSet
 urlpatterns = [
     path('register/', UserViewSet.as_view({'post': 'register', })),
     path('login/', UserViewSet.as_view({'post': 'login', })),
-    path('logut/', UserViewSet.as_view({'post': 'logut', })),
+    path('logout/', UserViewSet.as_view({'post': 'logout', })),
 ]
