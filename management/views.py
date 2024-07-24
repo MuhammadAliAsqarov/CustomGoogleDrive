@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import File, FileGroup
@@ -107,10 +109,20 @@ class FileViewSet(viewsets.ViewSet):
         serializer = FileSerializer(shared_files, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    parser_classes = [MultiPartParser, FormParser]
     @swagger_auto_schema(
         operation_description='Upload a file',
         operation_summary='Add file',
         request_body=FileSerializer,
+        manual_parameters=[
+            openapi.Parameter(
+                name='file',
+                in_=openapi.IN_FORM,
+                type=openapi.TYPE_FILE,
+                description='File to upload',
+                required=True,
+            ),
+        ],
         responses={201: FileSerializer,
                    400: 'Bad Request'
                    }
