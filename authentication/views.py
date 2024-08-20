@@ -8,11 +8,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from authentication.models import User
 from .serializers import UserRegisterSerializer, ChangePasswordSerializer,UserUpdateSerializer
-from .permissions import IsSuperAdminOrHR, IsEmployee
+
 
 
 class UserViewSet(viewsets.ViewSet):
-    permission_classes = [IsSuperAdminOrHR]
     def register(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -20,7 +19,6 @@ class UserViewSet(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, permission_classes=[IsEmployee])
     def login(self, request):
         data = request.data
         username = data.get('username')
