@@ -8,6 +8,10 @@
 #             if not stack or mapping[char] != stack.pop():
 #                 return False
 #     return True
+from collections import defaultdict
+
+from itypes import List
+
 
 # def romanToInt(s: str) -> int:
 #     translations = {
@@ -61,4 +65,42 @@
 #
 # my_list.insert(10, 100)  # Insert 100 at an index greater than the list size
 # print("After insertion at index 10:", my_list)
+
+def groupAnagrams(strs: List[str]) -> List[List[str]]:
+    ans = defaultdict(list)
+    for s in strs:
+        key = "".join(sorted(s))
+        ans[key].append(s)
+    print(ans.values())
+
+
+groupAnagrams(['aste', 'stea', 'eat', 'tea','ice'])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

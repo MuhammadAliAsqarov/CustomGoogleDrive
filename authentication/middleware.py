@@ -45,13 +45,12 @@ class UserTrackingMiddleware:
         user_agent = request.META.get('HTTP_USER_AGENT', 'unknown')
         path = request.path
 
-        # Use Django's ORM to save tracking data to the database
         UserTracking.objects.create(
             user=user,
             ip_address=ip_address,
             user_agent=user_agent,
             path=path,
-            timestamp=now()  # Automatically sets the current time
+            timestamp=now()
         )
 
     def get_client_ip(self, request):
